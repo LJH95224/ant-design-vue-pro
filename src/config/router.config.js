@@ -267,6 +267,22 @@ export const asyncRouterMap = [
             ]
           }
         ]
+      },
+      // Exception
+      {
+        path: '/amap',
+        name: 'amap',
+        component: RouteView,
+        redirect: '/amap/AMapView',
+        meta: { title: 'menu.amap', icon: 'compass', permission: ['user'] },
+        children: [
+          {
+            path: '/amap/AMapView',
+            name: 'AMapView',
+            component: () => import(/* webpackChunkName: "fail" */ '@/views/aMap/AMapView'),
+            meta: { title: 'menu.amap.amapview', permission: ['user'] }
+          }
+        ]
       }
 
       // other

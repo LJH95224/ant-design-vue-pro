@@ -681,6 +681,29 @@ const userNav = (options) => {
       },
       'component': 'AccountCenter'
     },
+    // map 高德地图
+    {
+      'name': 'amap',
+      'parentId': 0,
+      'id': 10101,
+      'meta': {
+        'title': '地图页',
+        'icon': 'compass',
+        'show': true
+      },
+      'redirect': '/amap/map',
+      'component': 'RouteView'
+    },
+    {
+      'name': 'map',
+      'parentId': 10101,
+      'id': 10102,
+      'meta': {
+        'title': '地图',
+        'show': true
+      },
+      'component': 'AMapView'
+    },
     // 特殊三级菜单
     {
       'name': 'settings',
