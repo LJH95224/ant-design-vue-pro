@@ -12,6 +12,7 @@
     "lint:nofix": "vue-cli-service lint --no-fix"
   },
   "dependencies": {
+    "@amap/amap-jsapi-loader": "^1.0.1",
     "@ant-design-vue/pro-layout": "^1.0.8",
     "@antv/data-set": "^0.10.2",
     "ant-design-vue": "^1.7.5",

@@ -2,7 +2,7 @@
  * @Description: 加载地图组件
  * @Autor: Alfred
  * @Date: 2021-06-15 11:36:11
- * @LastEditTime: 2021-06-15 11:46:04
+ * @LastEditTime: 2021-06-18 10:25:11
  * @FilePath: \ant-design-vue-pro\src\views\aMap\loadMap.js
  */
 export function loadBMap (ak) {
@@ -18,7 +18,7 @@ export function loadBMap (ak) {
       }
       const script = document.createElement('script')
       script.type = 'text/javascript'
-      script.src = 'https://webapi.amap.com/maps?v=1.4.15&key=' + ak
+      script.src = 'https://webapi.amap.com/maps?v=1.4.15&key=' + ak + '&callback=init'
       script.onerror = reject
       document.head.appendChild(script)
   })
