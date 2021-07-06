@@ -37,5 +37,7 @@ export default {
     'menu.account.trigger': 'Trigger Error',
     'menu.account.logout': 'Logout',
     'menu.amap': 'Map Page',
-    'menu.amap.amapview': 'aMap'
+    'menu.amap.amapview': 'aMap',
+    'menu.directives': 'Vue Directives',
+    'menu.directives.example': 'Directives Example'
 }

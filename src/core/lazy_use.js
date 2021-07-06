@@ -56,6 +56,7 @@ import MultiTab from '@/components/MultiTab'
 import PageLoading from '@/components/PageLoading'
 import PermissionHelper from '@/core/permission/permission'
 import './directives/action'
+import './directives/index'
 
 Vue.use(ConfigProvider)
 Vue.use(Layout)

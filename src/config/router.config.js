@@ -283,6 +283,21 @@ export const asyncRouterMap = [
             meta: { title: 'menu.amap.amapview', permission: ['user'] }
           }
         ]
+      },
+      {
+        path: '/directives',
+        name: 'directives',
+        component: RouteView,
+        redirect: '/directives/index',
+        meta: { title: 'menu.directives', icon: 'compass', permission: ['user'] },
+        children: [
+          {
+            path: '/directives/index',
+            name: 'directivesExamp',
+            component: () => import(/* webpackChunkName: "fail" */ '@/views/directives/index'),
+            meta: { title: 'menu.directives.example', permission: ['user'] }
+          }
+        ]
       }
 
       // other

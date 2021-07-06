@@ -37,5 +37,7 @@ export default {
     'menu.account.trigger': '触发报错',
     'menu.account.logout': '退出登录',
     'menu.amap': '地图页',
-    'menu.amap.amapview': '高德地图'
+    'menu.amap.amapview': '高德地图',
+    'menu.directives': 'Vue 指令',
+    'menu.directives.example': '指令示例'
 }
