@@ -556,6 +556,10 @@
   };
 
   var stop = function() {
+    const g = params.canvas.getContext('2d')
+		const x = params.map.getSize().width
+		const y = params.map.getSize().height
+		g.clearRect(0, 0, x, y)
     if (windy.field) windy.field.release();
     if (animationLoop) cancelAnimationFrame(animationLoop);
   };

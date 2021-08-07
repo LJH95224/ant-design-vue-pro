@@ -2,7 +2,7 @@
  * @Description: 高德地图页
  * @Autor: Alfred
  * @Date: 2021-06-15 10:44:53
- * @LastEditTime: 2021-08-07 10:29:09
+ * @LastEditTime: 2021-08-07 14:45:09
  * @FilePath: \ant-design-vue-pro\src\views\aMap\AMapView.vue
 -->
 <template>
@@ -14,10 +14,11 @@
 import { loadBMap } from './loadMap'
 import { ScanRadarModel, ScanRadarRange, getRadians } from './ScanRadarModel'
 import radarImg from '@/assets/site_type_radar_big.png'
-// import { Windy } from './windy.js'
+import { Windy } from './windy.js'
 // import windDataJSON from './windy.json'
+// 一张图数据
 import windDataJSON2 from './one.json'
-import * as _ from 'lodash'
+// import * as _ from 'lodash'
 var AMap = null
 export default {
   data () {
@@ -77,7 +78,8 @@ export default {
       // this.initMarker()
       // this.drawCanvas()
       // this.getWindData()
-      this.drawWindData(windDataJSON2.data)
+      // this.drawWindData(windDataJSON2.data)
+      this.drawRanderCustomLayer(windDataJSON2.data)
     },
     /**
      * @Author: Alfred
@@ -200,38 +202,63 @@ export default {
         }
       })
     },
-    drawWindData (winddata) {
+    drawRanderCustomLayer (winddata) {
       const _this = this
-      _this.canvasOverlayVector = document.createElement('canvas')
-      // _this.canvasOverlayVector.classList.add('velocity-overlay')
-			_this.canvasOverlayVector.width = _this.myamap.getSize().width
-			_this.canvasOverlayVector.height = _this.myamap.getSize().height
-      _this.canvasContent = _this.canvasOverlayVector.getContext('2d')
-      const southWest = [winddata[0].header.lo1, winddata[0].header.la1]
-      const northEast = [winddata[0].header.lo2, winddata[0].header.la2]
-      const customLayer = new AMap.CanvasLayer({
-        bounds: new AMap.Bounds(southWest, northEast),
-        canvas: _this.canvasOverlayVector,
-				zIndex: 1100
-			})
-      customLayer.setMap(_this.myamap)
-      // _this.myamap.add(customLayer)
-      // _this.canvasContent = _this.canvasOverlayVector.getContext('2d')
-      // const options = {
-      //   data: winddata,
-			// 	canvas: _this.canvasOverlayVector, // 绘制风流线的canvas对象
-			// 	map: _this.myamap // 地图对象
-			// }
-      // _this.windy = new Windy(options)
-      // this.onDrawLayer()
-      // console.log(_this.windy)
-      const windyLayer = _.filter(_this.myamap.getLayers(), item => item.CLASS_NAME === 'AMap.CanvasLayer')
-      console.log(windyLayer)
-      // _this.myamap.on('dragstart', _this.windy.stop)
-      // _this.myamap.on('dragend', _this.clearAndRestart())
-      // _this.myamap.on('zoomstart', _this.windy.stop)
-      // _this.myamap.on('zoomend', _this.clearAndRestart())
+     _this.canvasOverlayVector = document.createElement('canvas')
+      _this.canvasOverlayVector.width = this.myamap.getSize().width
+			_this.canvasOverlayVector.height = this.myamap.getSize().height
+      const customLayer = new AMap.CustomLayer(_this.canvasOverlayVector, {
+        zIndex: 22,
+        alwaysRender: true
+      })
+      const options = {
+        data: winddata,
+        canvas: _this.canvasOverlayVector, // 绘制风流线的canvas对象
+        map: _this.myamap // 地图对象
+      }
+      _this.windy = new Windy(options)
+       customLayer.setMap(_this.myamap)
+      this.onDrawLayer()
+      _this.myamap.on('dragstart', _this.windy.stop)
+      _this.myamap.on('dragend', _this.clearAndRestart())
+      _this.myamap.on('zoomstart', _this.windy.stop)
+      _this.myamap.on('zoomend', _this.clearAndRestart())
     },
+    // drawWindData (winddata) {
+    //   const _this = this
+    //   _this.canvasOverlayVector = document.createElement('canvas')
+    //   // _this.canvasOverlayVector.classList.add('velocity-overlay')
+		// 	_this.canvasOverlayVector.width = _this.myamap.getSize().width
+		// 	_this.canvasOverlayVector.height = _this.myamap.getSize().height
+    //   _this.canvasContent = _this.canvasOverlayVector.getContext('2d')
+    //   // const southWest = [winddata[0].header.lo1, winddata[0].header.la1]
+    //   // const northEast = [winddata[0].header.lo2, winddata[0].header.la2]
+    //   const southWest = new AMap.LngLat(winddata[0].header.lo1, winddata[0].header.la1)
+    //   const northEast = new AMap.LngLat(winddata[0].header.lo2, winddata[0].header.la2)
+    //   console.log(southWest, northEast)
+    //   const customLayer = new AMap.CanvasLayer({
+    //     bounds: new AMap.Bounds(southWest, northEast),
+    //     canvas: _this.canvasOverlayVector,
+		// 		zIndex: 1100
+		// 	})
+    //   customLayer.setMap(_this.myamap)
+    //   // _this.myamap.add(customLayer)
+    //   // _this.canvasContent = _this.canvasOverlayVector.getContext('2d')
+    //   const options = {
+    //     data: winddata,
+		// 		canvas: _this.canvasOverlayVector, // 绘制风流线的canvas对象
+		// 		map: _this.myamap // 地图对象
+		// 	}
+    //   _this.windy = new Windy(options)
+    //   this.onDrawLayer()
+    //   console.log(_this.windy)
+    //   const windyLayer = _.filter(_this.myamap.getLayers(), item => item.CLASS_NAME === 'AMap.CanvasLayer')
+    //   console.log(windyLayer)
+    //   // _this.myamap.on('dragstart', _this.windy.stop)
+    //   // _this.myamap.on('dragend', _this.clearAndRestart())
+    //   // _this.myamap.on('zoomstart', _this.windy.stop)
+    //   // _this.myamap.on('zoomend', _this.clearAndRestart())
+    // },
     onDrawLayer () {
       const _this = this
       if (!_this.windy) {
@@ -244,7 +271,6 @@ export default {
       }, 750)
     },
     clearAndRestart () {
-      if (this.canvasContent) this.canvasContent.clearRect(0, 0, 3000, 3000)
       if (this.windy) this.startWindy()
     },
     startWindy () {
