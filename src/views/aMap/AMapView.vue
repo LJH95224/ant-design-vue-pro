@@ -2,7 +2,7 @@
  * @Description: 高德地图页
  * @Autor: Alfred
  * @Date: 2021-06-15 10:44:53
- * @LastEditTime: 2021-06-18 17:06:11
+ * @LastEditTime: 2021-08-07 10:29:09
  * @FilePath: \ant-design-vue-pro\src\views\aMap\AMapView.vue
 -->
 <template>
@@ -14,6 +14,10 @@
 import { loadBMap } from './loadMap'
 import { ScanRadarModel, ScanRadarRange, getRadians } from './ScanRadarModel'
 import radarImg from '@/assets/site_type_radar_big.png'
+// import { Windy } from './windy.js'
+// import windDataJSON from './windy.json'
+import windDataJSON2 from './one.json'
+import * as _ from 'lodash'
 var AMap = null
 export default {
   data () {
@@ -28,7 +32,11 @@ export default {
       // 倾斜弧度;
       obliquityDegree: 20,
       // 雷达透明度;
-      opacity: 0.7
+      opacity: 0.7,
+      windy: null,
+      canvasOverlayVector: null,
+      canvasContent: null,
+      timer: null
     }
   },
   mounted () {
@@ -45,13 +53,15 @@ export default {
       console.log('a')
       const _this = this
       _this.myamap = new AMap.Map('container', {
-        pitch: 75, // 地图俯仰角度，有效范围 0 度- 83 度
-        zoom: 11, // 级别WW
-        center: [116.397428, 39.90923], // 中心点坐标
-        viewMode: '3D' // 使用3D视图
+        pitch: 0, // 地图俯仰角度，有效范围 0 度- 83 度
+        // zoom: 1, // 级别WW
+        // center: [116.397428, 39.90923], // 中心点坐标
+        viewMode: '3D', // 使用3D视图
+        zoom: 3,
+        center: [116.335183, 39.941735]
       })
 
-      AMap.plugin(['AMap.ControlBar', 'AMap.Scale', 'AMap.MapType'], function () {
+      AMap.plugin(['AMap.ControlBar', 'AMap.Scale', 'AMap.MapType', 'AMap.CustomLayer'], function () {
         // this 指向修改了
         _this.myamap.addControl(new AMap.ControlBar({
           position: {
@@ -62,9 +72,12 @@ export default {
         _this.myamap.addControl(new AMap.Scale())
         _this.myamap.addControl(new AMap.MapType())
       })
-      this.initDraw3D()
-      this.initDraw3DModel()
-      this.initMarker()
+      // this.initDraw3D()
+      // this.initDraw3DModel()
+      // this.initMarker()
+      // this.drawCanvas()
+      // this.getWindData()
+      this.drawWindData(windDataJSON2.data)
     },
     /**
      * @Author: Alfred
@@ -171,6 +184,117 @@ export default {
       AMap.event.addListener(marker, 'click', function () {
         infoWindow.open(_this.myamap, marker.getPosition())
       })
+    },
+    getWindData () {
+      const _this = this
+			const targetTime = '2021080420'
+      const params = {
+				bizId: `wind-json-0-${targetTime}`,
+				attachmentBizType: 10
+			}
+      _this.$http.get('http://ndp8.rnd.cas-pe.com:8080/platform-file-service/attachment/downloadAttachment', { params }).then((res) => {
+        if (res) {
+          _this.drawWindData(res)
+        } else {
+          console.error('无风场数据')
+        }
+      })
+    },
+    drawWindData (winddata) {
+      const _this = this
+      _this.canvasOverlayVector = document.createElement('canvas')
+      // _this.canvasOverlayVector.classList.add('velocity-overlay')
+			_this.canvasOverlayVector.width = _this.myamap.getSize().width
+			_this.canvasOverlayVector.height = _this.myamap.getSize().height
+      _this.canvasContent = _this.canvasOverlayVector.getContext('2d')
+      const southWest = [winddata[0].header.lo1, winddata[0].header.la1]
+      const northEast = [winddata[0].header.lo2, winddata[0].header.la2]
+      const customLayer = new AMap.CanvasLayer({
+        bounds: new AMap.Bounds(southWest, northEast),
+        canvas: _this.canvasOverlayVector,
+				zIndex: 1100
+			})
+      customLayer.setMap(_this.myamap)
+      // _this.myamap.add(customLayer)
+      // _this.canvasContent = _this.canvasOverlayVector.getContext('2d')
+      // const options = {
+      //   data: winddata,
+			// 	canvas: _this.canvasOverlayVector, // 绘制风流线的canvas对象
+			// 	map: _this.myamap // 地图对象
+			// }
+      // _this.windy = new Windy(options)
+      // this.onDrawLayer()
+      // console.log(_this.windy)
+      const windyLayer = _.filter(_this.myamap.getLayers(), item => item.CLASS_NAME === 'AMap.CanvasLayer')
+      console.log(windyLayer)
+      // _this.myamap.on('dragstart', _this.windy.stop)
+      // _this.myamap.on('dragend', _this.clearAndRestart())
+      // _this.myamap.on('zoomstart', _this.windy.stop)
+      // _this.myamap.on('zoomend', _this.clearAndRestart())
+    },
+    onDrawLayer () {
+      const _this = this
+      if (!_this.windy) {
+        _this.drawWindData(windDataJSON2.data)
+        return
+      }
+      if (_this.timer) clearTimeout(_this._timer)
+      _this.timer = setTimeout(function () {
+        _this.startWindy()
+      }, 750)
+    },
+    clearAndRestart () {
+      if (this.canvasContent) this.canvasContent.clearRect(0, 0, 3000, 3000)
+      if (this.windy) this.startWindy()
+    },
+    startWindy () {
+      const bounds = this.myamap.getBounds()
+      const size = this.myamap.getSize()
+      console.log(bounds.bounds[0].lng, bounds.bounds[0].lat)
+      console.log(bounds.bounds[1].lng, bounds.bounds[1].lat)
+      console.log(bounds.bounds[2].lng, bounds.bounds[2].lat)
+      console.log(bounds.bounds[3].lng, bounds.bounds[3].lat)
+      console.log(bounds.bounds[4].lng, bounds.bounds[4].lat)
+      this.windy.start([[0, 0], [size.width, size.height]], size.width, size.height, [[bounds.bounds[0].lng, bounds.bounds[0].lat], [bounds.bounds[2].lng, bounds.bounds[2].lat]])
+    },
+    drawCanvas () {
+      var canvas = document.createElement('canvas')
+      canvas.width = canvas.height = 200
+
+      var context = canvas.getContext('2d')
+      context.fillStyle = 'rgb(0,100,255)'
+      context.strokeStyle = 'white'
+      context.globalAlpha = 1
+      context.lineWidth = 2
+
+      var radious = 0
+      var draw = function () {
+        context.clearRect(0, 0, 200, 200)
+        context.globalAlpha = (context.globalAlpha - 0.01 + 1) % 1
+        radious = (radious + 1) % 100
+
+        context.beginPath()
+        context.arc(100, 100, radious, 0, 2 * Math.PI)
+        context.fill()
+        context.stroke()
+
+        // 2D视图时可以省略
+        CanvasLayer.reFresh()
+
+        AMap.Util.requestAnimFrame(draw)
+      }
+
+      var CanvasLayer = new AMap.CanvasLayer({
+        canvas: canvas,
+        bounds: new AMap.Bounds(
+            [66, 10],
+            [140, 58]
+        ),
+        zooms: [3, 18]
+      })
+
+      CanvasLayer.setMap(this.myamap)
+      draw()
     }
   }
 }

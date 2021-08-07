@@ -26,6 +26,30 @@
         </a-card>
       </a-col>
     </a-row>
+    <a-select default-value="lucy" mode="combobox" style="width: 120px">
+      <a-select-option value="jack">
+        Jack
+      </a-select-option>
+      <a-select-option value="lucy">
+        Lucy
+      </a-select-option>
+      <a-select-option value="disabled" disabled>
+        Disabled
+      </a-select-option>
+      <a-select-option value="Yiminghe">
+        yiminghe
+      </a-select-option>
+    </a-select>
+    <a-select default-value="lucy" style="width: 120px" disabled>
+      <a-select-option value="lucy">
+        Lucy
+      </a-select-option>
+    </a-select>
+    <a-select default-value="lucy" style="width: 120px" loading>
+      <a-select-option value="lucy">
+        Lucy
+      </a-select-option>
+    </a-select>
   </page-header-wrapper>
 </template>
 
